@@ -12,6 +12,7 @@ import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import BasicMenu from "./BasicMenu";
 import { useLocation } from "react-router-dom";
+import StickyTitle from "./StickyTitle";
 
 type Props = {};
 
@@ -32,19 +33,21 @@ const Navbar = (props: Props) => {
     }
   }, [location]);
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          {user && <BasicMenu />}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {page}
-          </Typography>
-          <Button color="inherit" onClick={logout}>
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
+    <StickyTitle>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar variant="dense">
+            {user && <BasicMenu />}
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {page}
+            </Typography>
+            <Button color="inherit" onClick={logout}>
+              Logout
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </Box>
+    </StickyTitle>
   );
 };
 

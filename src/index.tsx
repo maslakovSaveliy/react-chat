@@ -1,5 +1,7 @@
+import { getAuth } from "firebase/auth";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { Provider } from "react-redux";
 import App from "./App";
 import "./firebase";
@@ -8,6 +10,8 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 const store = setupStore();
+const auth = getAuth();
+const [user, loading] = useAuthState(auth);
 root.render(
   <Provider store={store}>
     <App />

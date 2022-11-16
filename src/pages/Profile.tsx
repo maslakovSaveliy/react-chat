@@ -22,7 +22,6 @@ const Profile = (props: Props) => {
     { title: "1", describe: "vsavvsa" },
     { title: "1", describe: "vsavvsa" },
   ];
-  console.log(window.innerWidth);
   return (
     <Container>
       <Grid
@@ -34,7 +33,71 @@ const Profile = (props: Props) => {
         padding="0.3cm"
       >
         <Grid id="child_grid" width="27.5%">
-          <Paper sx={{ width: "100%", height: "100%", padding: "0.2cm" }}>
+          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+            <Grid container flexDirection="column" alignItems="center">
+              <Box width="100%" marginBottom="0.2cm">
+                <Avatar
+                  sx={{ width: "100%", height: "100%" }}
+                  src={user?.photoURL?.toString()}
+                  alt="user_avatar"
+                />
+              </Box>
+              <Typography variant="h4">
+                Nickname: {user?.displayName}
+              </Typography>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid className="child_grid" width="67.5%">
+          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+            <Grid container flexDirection="column">
+              <Typography variant="h2">Posts:</Typography>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Grid
+        id="root__grid"
+        container
+        style={{ height: window.innerHeight - 50 }}
+        alignItems="top"
+        justifyContent="space-around"
+        padding="0.3cm"
+      >
+        <Grid id="child_grid" width="27.5%">
+          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+            <Grid container flexDirection="column" alignItems="center">
+              <Box width="100%" marginBottom="0.2cm">
+                <Avatar
+                  sx={{ width: "100%", height: "100%" }}
+                  src={user?.photoURL?.toString()}
+                  alt="user_avatar"
+                />
+              </Box>
+              <Typography variant="h4">
+                Nickname: {user?.displayName}
+              </Typography>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid className="child_grid" width="67.5%">
+          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+            <Grid container flexDirection="column">
+              <Typography variant="h2">Posts:</Typography>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Grid
+        id="root__grid"
+        container
+        style={{ height: window.innerHeight - 50 }}
+        alignItems="top"
+        justifyContent="space-around"
+        padding="0.3cm"
+      >
+        <Grid id="child_grid" width="27.5%">
+          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
             <Grid container flexDirection="column" alignItems="center">
               <Box width="100%" marginBottom="0.2cm">
                 <Avatar

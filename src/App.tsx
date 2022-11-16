@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import "./App.css";
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "./router/AppRouter";
@@ -9,11 +9,17 @@ import { Container } from "@mui/system";
 import { Grid } from "@mui/material";
 import Navbar from "./components/Navbar";
 import "./App.css";
+import ScrollToTop from "./components/ScrollToTop";
+import { useObserver } from "./hooks/useObserver";
 function App() {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
+  const firstElement = useRef<HTMLDivElement>(null);
+  const [toTopBtn, setToTopBtn] = useState(false);
+  useObserver(setToTopBtn, firstElement);
   return (
     <BrowserRouter>
+      <div ref={firstElement}></div>
       {loading ? (
         <Container>
           <Grid
@@ -30,6 +36,7 @@ function App() {
         <>
           {user && <Navbar />}
           <AppRouter />
+          <ScrollToTop visible={toTopBtn} />
         </>
       )}
     </BrowserRouter>
