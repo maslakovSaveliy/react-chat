@@ -9,7 +9,7 @@ const initialState: AuthState = {
   account: null,
 };
 export const userSlice = createSlice({
-  name: "auth",
+  name: "user",
   initialState,
   reducers: {
     setAuth(state, action: PayloadAction<Auth>) {
@@ -20,5 +20,4 @@ export const userSlice = createSlice({
     },
   },
 });
-
 export default userSlice.reducer;

@@ -11,7 +11,6 @@ const root = ReactDOM.createRoot(
 );
 const store = setupStore();
 const auth = getAuth();
-const [user, loading] = useAuthState(auth);
 root.render(
   <Provider store={store}>
     <App />
