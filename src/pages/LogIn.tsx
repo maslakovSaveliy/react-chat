@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { getAuth } from "firebase/auth";
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -19,6 +20,7 @@ import {
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
 type Props = {};
 interface FormValues {
   email: string;
@@ -50,9 +52,10 @@ const Login = (props: Props) => {
     event.preventDefault();
   };
   const auth = getAuth();
-  const [signInWithEmailAndPassword, user, loading, error] =
+  const [signInWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useSignInWithEmailAndPassword(auth);
-  const [signInWithGoogle] = useSignInWithGoogle(auth);
+  const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
+    useSignInWithGoogle(auth);
   const login = async () => {
     await signInWithEmailAndPassword(values.email, values.password);
   };
@@ -65,54 +68,67 @@ const Login = (props: Props) => {
         justifyContent="center"
         direction="column"
       >
-        <Box component="form">
-          <Grid container alignItems="center" direction="column">
-            <TextField
-              sx={{ width: "30ch" }}
-              id="outlined-email-required"
-              label="Email"
-              value={values.email}
-              onChange={handleChange("email")}
-            />
-            <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                type={values.showPassword ? "text" : "password"}
-                value={values.password}
-                onChange={handleChange("password")}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-              />
-            </FormControl>
-            <Button variant="contained" onClick={login}>
-              Login
+        {loadingEmail || loadingGoogle ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <Box component="form">
+              <Grid container alignItems="center" direction="column">
+                <TextField
+                  sx={{ width: "30ch" }}
+                  id="outlined-email-required"
+                  label="Email"
+                  value={values.email}
+                  onChange={handleChange("email")}
+                />
+                <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">
+                  <InputLabel htmlFor="outlined-adornment-password">
+                    Password
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={values.showPassword ? "text" : "password"}
+                    value={values.password}
+                    onChange={handleChange("password")}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {values.showPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Password"
+                  />
+                </FormControl>
+                <Button sx={{ mb: 1 }} variant="contained" onClick={login}>
+                  Login
+                </Button>
+                {errorEmail && (
+                  <Alert severity="error">{errorEmail?.message}</Alert>
+                )}
+              </Grid>
+            </Box>
+            <Button
+              variant="outlined"
+              sx={{ m: 1 }}
+              onClick={async () => await signInWithGoogle()}
+            >
+              <GoogleIcon />
             </Button>
-          </Grid>
-        </Box>
-        <Button
-          variant="outlined"
-          sx={{ m: 1 }}
-          onClick={async () => await signInWithGoogle()}
-        >
-          <GoogleIcon />
-        </Button>
-        <Link to="/signup">
-          <Button variant="text">or SignUp</Button>
-        </Link>
+            <Link to="/signup">
+              <Button variant="text">or SignUp</Button>
+            </Link>
+          </>
+        )}
       </Grid>
     </Container>
   );

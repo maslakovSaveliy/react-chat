@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -20,6 +21,7 @@ import {
   useUpdateProfile,
 } from "react-firebase-hooks/auth";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
 type Props = {};
 interface FormValues {
   displayName: string;
@@ -53,10 +55,11 @@ const Signup = (props: Props) => {
   ) => {
     event.preventDefault();
   };
-  const [createUserWithEmailAndPassword, user, loading, error] =
+  const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
-  const [updateProfile, updating] = useUpdateProfile(auth);
-  const [signInWithGoogle] = useSignInWithGoogle(auth);
+  const [updateProfile] = useUpdateProfile(auth);
+  const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
+    useSignInWithGoogle(auth);
   const signup = async () => {
     await createUserWithEmailAndPassword(values.email, values.password);
     const displayName = values.displayName;
@@ -71,61 +74,74 @@ const Signup = (props: Props) => {
         justifyContent="center"
         direction="column"
       >
-        <Box component="form">
-          <Grid container alignItems="center" direction="column">
-            <TextField
-              id="displayName"
-              sx={{ m: 1, width: "30ch" }}
-              label="Nickname"
-              value={values.displayName}
-              onChange={handleChange("displayName")}
-            />
-            <TextField
-              sx={{ width: "30ch" }}
-              id="outlined-email-required"
-              label="Email"
-              value={values.email}
-              onChange={handleChange("email")}
-            />
-            <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                type={values.showPassword ? "text" : "password"}
-                value={values.password}
-                onChange={handleChange("password")}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-              />
-            </FormControl>
-            <Button variant="contained" onClick={signup}>
-              SignUp
+        {loadingEmail || loadingGoogle ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <Box component="form">
+              <Grid container alignItems="center" direction="column">
+                <TextField
+                  id="displayName"
+                  sx={{ m: 1, width: "30ch" }}
+                  label="Nickname"
+                  value={values.displayName}
+                  onChange={handleChange("displayName")}
+                />
+                <TextField
+                  sx={{ width: "30ch" }}
+                  id="outlined-email-required"
+                  label="Email"
+                  value={values.email}
+                  onChange={handleChange("email")}
+                />
+                <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">
+                  <InputLabel htmlFor="outlined-adornment-password">
+                    Password
+                  </InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={values.showPassword ? "text" : "password"}
+                    value={values.password}
+                    onChange={handleChange("password")}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {values.showPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Password"
+                  />
+                </FormControl>
+                <Button sx={{ mb: 1 }} variant="contained" onClick={signup}>
+                  SignUp
+                </Button>
+                {errorEmail && (
+                  <Alert severity="error">{errorEmail?.message}</Alert>
+                )}
+              </Grid>
+            </Box>
+            <Button
+              variant="outlined"
+              sx={{ m: 1 }}
+              onClick={async () => await signInWithGoogle()}
+            >
+              <GoogleIcon />
             </Button>
-          </Grid>
-        </Box>
-        <Button
-          variant="outlined"
-          sx={{ m: 1 }}
-          onClick={async () => await signInWithGoogle()}
-        >
-          <GoogleIcon />
-        </Button>
-        <Link to="/login">
-          <Button variant="text">or LogIn</Button>
-        </Link>
+            <Link to="/login">
+              <Button variant="text">or LogIn</Button>
+            </Link>
+          </>
+        )}
       </Grid>
     </Container>
   );
