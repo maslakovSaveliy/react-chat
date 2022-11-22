@@ -66,7 +66,6 @@ const Profile = () => {
       <Grid
         id="root__grid"
         container
-        style={{ height: window.innerHeight - 50 }}
         alignItems="top"
         justifyContent="space-around"
         padding="0.3cm"
@@ -100,6 +99,7 @@ const Profile = () => {
               >
                 <Fade in={open}>
                   <Box
+                    id="modal"
                     sx={{
                       position: "absolute" as "absolute",
                       top: "50%",
@@ -119,8 +119,14 @@ const Profile = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid className="child_grid" width="67.5%">
-          <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+        <Grid
+          id="child_grid"
+          width="67.5%"
+          sx={{
+            wordWrap: "break-word",
+          }}
+        >
+          <Paper sx={{ width: "100%", padding: "10px" }}>
             <Grid container flexDirection="column">
               <Typography variant="h2">Posts:</Typography>
               {postsLoading ? (

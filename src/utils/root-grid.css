@@ -4,11 +4,23 @@
     justify-content: flex-start;
     align-items: center;
   }
+  .MuiGrid-root.css-1195wpd-MuiGrid-root {
+    max-width: 100%;
+  }
+  #modal {
+    width: 80%;
+  }
   #child_grid {
     width: 100%;
     margin-bottom: 10px;
+    word-wrap: break-word;
   }
   .MuiGrid-root.MuiGrid-container.css-k6wrnl-MuiGrid-root {
     align-items: center;
+  }
+  .MuiGrid-root.css-1195wpd-MuiGrid-root {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
 }
