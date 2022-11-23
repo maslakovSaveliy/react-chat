@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   IconButton,
+  Slide,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -34,19 +35,21 @@ const Navbar = (props: Props) => {
   }, [location]);
   return (
     <StickyTitle>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
-          <Toolbar variant="dense">
-            {user && <BasicMenu />}
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {page}
-            </Typography>
-            <Button color="inherit" onClick={logout}>
-              Logout
-            </Button>
-          </Toolbar>
-        </AppBar>
-      </Box>
+      <Slide direction="down" in={true}>
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="static">
+            <Toolbar variant="dense">
+              {user && <BasicMenu />}
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {page}
+              </Typography>
+              <Button color="inherit" onClick={logout}>
+                Logout
+              </Button>
+            </Toolbar>
+          </AppBar>
+        </Box>
+      </Slide>
     </StickyTitle>
   );
 };

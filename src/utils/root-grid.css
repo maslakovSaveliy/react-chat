@@ -5,7 +5,8 @@
     align-items: center;
   }
   .MuiGrid-root.css-1195wpd-MuiGrid-root {
-    max-width: 100%;
+    width: 100%;
+    margin: 0;
   }
   #modal {
     width: 80%;

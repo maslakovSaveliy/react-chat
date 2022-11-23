@@ -36,7 +36,7 @@ function App() {
         <>
           {user && <Navbar />}
           <AppRouter />
-          <ScrollToTop visible={toTopBtn} />
+          <ScrollToTop visible={toTopBtn} setVisible={setToTopBtn} />
         </>
       )}
     </BrowserRouter>
