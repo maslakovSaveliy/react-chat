@@ -27,6 +27,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import AddPostForm from "../components/AddPostForm";
+import { app } from "../firebase";
 interface FormValues {
   title: string;
   body: string;
@@ -42,6 +43,7 @@ const Profile = () => {
   const userPosts = posts?.filter(
     (post) => post.displayName == user?.displayName
   );
+  console.log(auth.currentUser);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

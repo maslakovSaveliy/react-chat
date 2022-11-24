@@ -22,6 +22,8 @@ import {
 } from "react-firebase-hooks/auth";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 type Props = {};
 interface FormValues {
   displayName: string;
@@ -61,9 +63,43 @@ const Signup = (props: Props) => {
   const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
     useSignInWithGoogle(auth);
   const signup = async () => {
-    await createUserWithEmailAndPassword(values.email, values.password);
+    const emailUser = await createUserWithEmailAndPassword(
+      values.email,
+      values.password
+    );
     const displayName = values.displayName;
     await updateProfile({ displayName });
+    if (
+      !users?.find(({ uid }) => {
+        console.log(uid, emailUser?.user.uid);
+        return uid == emailUser?.user.uid;
+      })
+    ) {
+      await addDoc(collection(firestore, "users"), {
+        displayName: auth.currentUser?.displayName,
+        email: auth.currentUser?.email,
+        photoURL: auth.currentUser?.photoURL,
+        uid: auth.currentUser?.uid,
+      });
+    }
+  };
+  const firestore = getFirestore();
+  const [users] = useCollectionData(collection(firestore, "users"));
+  const loginWithGoogle = async () => {
+    const googleUser = await signInWithGoogle();
+    if (
+      !users?.find(({ uid }) => {
+        console.log(uid, googleUser?.user.uid);
+        return uid == googleUser?.user.uid;
+      })
+    ) {
+      await addDoc(collection(firestore, "users"), {
+        displayName: auth.currentUser?.displayName,
+        email: auth.currentUser?.email,
+        photoURL: auth.currentUser?.photoURL,
+        uid: auth.currentUser?.uid,
+      });
+    }
   };
   return (
     <Container>
@@ -130,11 +166,7 @@ const Signup = (props: Props) => {
                 )}
               </Grid>
             </Box>
-            <Button
-              variant="outlined"
-              sx={{ m: 1 }}
-              onClick={async () => await signInWithGoogle()}
-            >
+            <Button variant="outlined" sx={{ m: 1 }} onClick={loginWithGoogle}>
               <GoogleIcon />
             </Button>
             <Link to="/login">

@@ -16,11 +16,14 @@ import {
 import { Link } from "react-router-dom";
 import GoogleIcon from "@mui/icons-material/Google";
 import {
+  useAuthState,
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 type Props = {};
 interface FormValues {
   email: string;
@@ -51,6 +54,7 @@ const Login = (props: Props) => {
   ) => {
     event.preventDefault();
   };
+  const firestore = getFirestore();
   const auth = getAuth();
   const [signInWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useSignInWithEmailAndPassword(auth);
@@ -58,6 +62,23 @@ const Login = (props: Props) => {
     useSignInWithGoogle(auth);
   const login = async () => {
     await signInWithEmailAndPassword(values.email, values.password);
+  };
+  const [users] = useCollectionData(collection(firestore, "users"));
+  const loginWithGoogle = async () => {
+    const googleUser = await signInWithGoogle();
+    if (
+      !users?.find(({ uid }) => {
+        console.log(uid, googleUser?.user.uid);
+        return uid == googleUser?.user.uid;
+      })
+    ) {
+      await addDoc(collection(firestore, "users"), {
+        displayName: auth.currentUser?.displayName,
+        email: auth.currentUser?.email,
+        photoURL: auth.currentUser?.photoURL,
+        uid: auth.currentUser?.uid,
+      });
+    }
   };
   return (
     <Container>
@@ -117,11 +138,7 @@ const Login = (props: Props) => {
                 )}
               </Grid>
             </Box>
-            <Button
-              variant="outlined"
-              sx={{ m: 1 }}
-              onClick={async () => await signInWithGoogle()}
-            >
+            <Button variant="outlined" sx={{ m: 1 }} onClick={loginWithGoogle}>
               <GoogleIcon />
             </Button>
             <Link to="/signup">
