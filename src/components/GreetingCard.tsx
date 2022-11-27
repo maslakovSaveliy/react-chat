@@ -1,10 +1,14 @@
-import { Box, Paper, Slide, Typography } from "@mui/material";
+import { Box, Button, Paper, Slide, Typography } from "@mui/material";
 import { height } from "@mui/system";
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Context } from "../context/Context";
 
 type Props = {};
 
 const GreetingCard = (props: Props) => {
+  const navigate = useNavigate();
+  const { handleOpen } = useContext(Context);
   return (
     <Box
       sx={{
@@ -28,6 +32,14 @@ const GreetingCard = (props: Props) => {
       <Slide direction="left" in={true}>
         <Box alignSelf="flex-end">
           <Typography variant="h4">How are you?</Typography>
+          <Button
+            onClick={() => {
+              navigate("/profile");
+              handleOpen();
+            }}
+          >
+            Share it!
+          </Button>
         </Box>
       </Slide>
     </Box>

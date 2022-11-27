@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   Avatar,
   Backdrop,
@@ -28,11 +28,14 @@ import {
 } from "firebase/firestore";
 import AddPostForm from "../components/AddPostForm";
 import { app } from "../firebase";
+import FriendsList from "../components/FriendsList";
+import { Context } from "../context/Context";
 interface FormValues {
   title: string;
   body: string;
 }
 const Profile = () => {
+  const { open, handleClose, handleOpen } = useContext(Context);
   const lastElement = useRef<HTMLDivElement>(null);
   const auth = getAuth();
   const firestore = getFirestore();
@@ -40,13 +43,13 @@ const Profile = () => {
   const [posts, postsLoading] = useCollectionData(
     query(collection(firestore, "posts"), orderBy("createdAt", "desc"))
   );
+  const [users, usersLoading] = useCollectionData(
+    collection(firestore, "users")
+  );
+  const dbUser = users?.find(({ uid }) => uid == user?.uid);
   const userPosts = posts?.filter(
     (post) => post.displayName == user?.displayName
   );
-  console.log(auth.currentUser);
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const openModal = async () => {
     handleOpen();
   };
@@ -77,7 +80,7 @@ const Profile = () => {
       >
         <Slide direction="right" in={true}>
           <Grid id="child_grid" width="27.5%">
-            <Paper sx={{ width: "100%", padding: "0.2cm" }}>
+            <Paper sx={{ width: "100%", padding: "0.2cm", mb: 1 }}>
               <Grid container flexDirection="column" alignItems="center">
                 <Box width="100%" marginBottom="0.2cm">
                   <Avatar
@@ -126,6 +129,38 @@ const Profile = () => {
                   </Fade>
                 </Modal>
               </Grid>
+            </Paper>
+            <Paper
+              sx={{
+                width: "100%",
+                padding: "0.2cm",
+              }}
+            >
+              <FriendsList
+                friends={[
+                  {
+                    displayName: "scs",
+                    email: "vdva",
+                    friends: [],
+                    photoURL: "",
+                    uid: "3t3gewgq",
+                  },
+                  {
+                    displayName: "scs",
+                    email: "vdva",
+                    friends: [],
+                    photoURL: "",
+                    uid: "3t3gewgvsq",
+                  },
+                  {
+                    displayName: "scs",
+                    email: "vdva",
+                    friends: [],
+                    photoURL: "",
+                    uid: "3t3gewvdsvsdvsdvgq",
+                  },
+                ]}
+              />
             </Paper>
           </Grid>
         </Slide>

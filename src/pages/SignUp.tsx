@@ -98,6 +98,7 @@ const Signup = (props: Props) => {
         email: auth.currentUser?.email,
         photoURL: auth.currentUser?.photoURL,
         uid: auth.currentUser?.uid,
+        friends: [],
       });
     }
   };
