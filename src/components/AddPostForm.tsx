@@ -8,8 +8,9 @@ interface FormValues {
 type Props = {
   addPost: (value: FormValues, setValue: ({}: FormValues) => void) => void;
   isLoading: boolean;
+  error: boolean;
 };
-const AddPostForm: FC<Props> = ({ addPost, isLoading }) => {
+const AddPostForm: FC<Props> = ({ addPost, isLoading, error }) => {
   const [formValues, setFormValues] = useState<FormValues>({
     title: "",
     body: "",
@@ -27,6 +28,7 @@ const AddPostForm: FC<Props> = ({ addPost, isLoading }) => {
         ) : (
           <>
             <TextField
+              error={error}
               sx={{ mb: 1 }}
               required
               label="Title"
@@ -36,6 +38,7 @@ const AddPostForm: FC<Props> = ({ addPost, isLoading }) => {
               }
             />
             <TextField
+              error={error}
               sx={{ mb: 1 }}
               required
               label="Description"

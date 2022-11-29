@@ -10,7 +10,7 @@ import React, { FC } from "react";
 import { IUser } from "../models/IUser";
 
 type Props = {
-  friends: IUser[];
+  friends: IUser[] | undefined;
 };
 
 const FriendsList: FC<Props> = ({ friends }) => {
@@ -25,7 +25,7 @@ const FriendsList: FC<Props> = ({ friends }) => {
         </ListSubheader>
       }
     >
-      {friends.map((friend) => (
+      {friends?.map((friend) => (
         <ListItemButton key={friend.uid}>
           <ListItemIcon>
             <Avatar src={friend.photoURL} />

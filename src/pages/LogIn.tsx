@@ -22,7 +22,13 @@ import {
 } from "react-firebase-hooks/auth";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getFirestore,
+  setDoc,
+} from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 type Props = {};
 interface FormValues {
@@ -72,12 +78,13 @@ const Login = (props: Props) => {
         return uid == googleUser?.user.uid;
       })
     ) {
-      await addDoc(collection(firestore, "users"), {
+      await setDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
         displayName: auth.currentUser?.displayName,
         email: auth.currentUser?.email,
         photoURL: auth.currentUser?.photoURL,
         uid: auth.currentUser?.uid,
         friends: [],
+        posts: [],
       });
     }
   };

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Backdrop,
@@ -14,22 +14,32 @@ import {
 } from "@mui/material";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import {
+  useCollectionData,
+  useDocument,
+  useDocumentData,
+  useDocumentOnce,
+} from "react-firebase-hooks/firestore";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../utils/root-grid.css";
 import {
   addDoc,
   collection,
+  doc,
   getFirestore,
   orderBy,
   Query,
   query,
   serverTimestamp,
+  Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import AddPostForm from "../components/AddPostForm";
 import { app } from "../firebase";
 import FriendsList from "../components/FriendsList";
 import { Context } from "../context/Context";
+import { IUser } from "../models/IUser";
+import { IPost } from "../models/IPost";
 interface FormValues {
   title: string;
   body: string;
@@ -39,35 +49,39 @@ const Profile = () => {
   const lastElement = useRef<HTMLDivElement>(null);
   const auth = getAuth();
   const firestore = getFirestore();
-  const [user] = useAuthState(auth);
-  const [posts, postsLoading] = useCollectionData(
-    query(collection(firestore, "posts"), orderBy("createdAt", "desc"))
-  );
+  const [userAuth] = useAuthState(auth);
   const [users, usersLoading] = useCollectionData(
     collection(firestore, "users")
-  );
-  const dbUser = users?.find(({ uid }) => uid == user?.uid);
-  const userPosts = posts?.filter(
-    (post) => post.displayName == user?.displayName
   );
   const openModal = async () => {
     handleOpen();
   };
+  const [valuesError, setValuesError] = useState<boolean>(false);
   const [isPostSending, setIsPostSending] = useState(false);
+
   const addPost = async (
     value: FormValues,
     setValue: ({}: FormValues) => void
   ) => {
-    setIsPostSending(true);
-    await addDoc(collection(firestore, "posts"), {
-      displayName: user?.displayName,
-      title: value.title,
-      body: value.body,
-      createdAt: serverTimestamp(),
-    });
-    setIsPostSending(false);
-    handleClose();
-    setValue({ title: "", body: "" });
+    if (value.body.length > 0 && value.title.length > 0) {
+      setValuesError(false);
+      setIsPostSending(true);
+      await updateDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
+        posts: [
+          ...users?.find((user) => user.uid == userAuth?.uid)?.posts,
+          {
+            body: value.body,
+            title: value.title,
+            createdAt: Timestamp.now(),
+          },
+        ],
+      });
+      setIsPostSending(false);
+      handleClose();
+      setValue({ title: "", body: "" });
+    } else {
+      setValuesError(true);
+    }
   };
   return (
     <Container>
@@ -85,12 +99,12 @@ const Profile = () => {
                 <Box width="100%" marginBottom="0.2cm">
                   <Avatar
                     sx={{ width: "100%", height: "100%" }}
-                    src={user?.photoURL?.toString()}
+                    src={userAuth?.photoURL?.toString()}
                     alt="user_avatar"
                   />
                 </Box>
                 <Typography sx={{ m: 1 }} variant="h4">
-                  Nickname: {user?.displayName}
+                  Nickname: {userAuth?.displayName}
                 </Typography>
                 <Button variant="outlined" onClick={openModal}>
                   Add post
@@ -122,6 +136,7 @@ const Profile = () => {
                       }}
                     >
                       <AddPostForm
+                        error={valuesError}
                         addPost={addPost}
                         isLoading={isPostSending}
                       />
@@ -136,31 +151,15 @@ const Profile = () => {
                 padding: "0.2cm",
               }}
             >
-              <FriendsList
-                friends={[
-                  {
-                    displayName: "scs",
-                    email: "vdva",
-                    friends: [],
-                    photoURL: "",
-                    uid: "3t3gewgq",
-                  },
-                  {
-                    displayName: "scs",
-                    email: "vdva",
-                    friends: [],
-                    photoURL: "",
-                    uid: "3t3gewgvsq",
-                  },
-                  {
-                    displayName: "scs",
-                    email: "vdva",
-                    friends: [],
-                    photoURL: "",
-                    uid: "3t3gewvdsvsdvsdvgq",
-                  },
-                ]}
-              />
+              {usersLoading ? (
+                <CircularProgress />
+              ) : (
+                <FriendsList
+                  friends={
+                    users?.find((user) => user.uid == userAuth?.uid)?.friends
+                  }
+                />
+              )}
             </Paper>
           </Grid>
         </Slide>
@@ -175,34 +174,29 @@ const Profile = () => {
             <Paper sx={{ width: "100%", padding: "10px" }}>
               <Grid container flexDirection="column">
                 <Typography variant="h2">Posts:</Typography>
-                {postsLoading ? (
+                {usersLoading ? (
                   <CircularProgress />
                 ) : (
-                  userPosts?.map((post, index) => (
-                    <Fade key={index} in={true}>
-                      <Grid
-                        sx={{
-                          padding: "0.2cm",
-                          m: 1,
-                          borderTop: "1px solid lightgray",
-                        }}
-                      >
-                        <Typography variant="h3">{post.title}</Typography>
-                        <Typography variant="h5">{post.body}</Typography>
-                        <Typography variant="body2" color="lightgray">
-                          {post.createdAt
-                            .toDate()
-                            .toLocaleDateString("en-us", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })
-                            .toString()}
-                        </Typography>
-                      </Grid>
-                    </Fade>
-                  ))
+                  users
+                    ?.find((user) => user.uid == userAuth?.uid)
+                    ?.posts?.reverse()
+                    .map((post: IPost, index: number) => (
+                      <Fade key={index} in={true}>
+                        <Grid
+                          sx={{
+                            padding: "0.2cm",
+                            m: 1,
+                            borderTop: "1px solid lightgray",
+                          }}
+                        >
+                          <Typography variant="h3">{post.title}</Typography>
+                          <Typography variant="h5">{post.body}</Typography>
+                          <Typography variant="body2" color="lightgray">
+                            {post.createdAt.toDate().toUTCString()}
+                          </Typography>
+                        </Grid>
+                      </Fade>
+                    ))
                 )}
                 <div ref={lastElement} />
               </Grid>
