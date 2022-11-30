@@ -12,6 +12,7 @@ import {
   InputLabel,
   OutlinedInput,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -66,15 +67,22 @@ const Login = (props: Props) => {
     useSignInWithEmailAndPassword(auth);
   const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
     useSignInWithGoogle(auth);
-  const login = async () => {
-    await signInWithEmailAndPassword(values.email, values.password);
-  };
   const [users] = useCollectionData(collection(firestore, "users"));
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const login = async () => {
+    if (!users?.map((user) => user.email == values.email)) {
+      setEmailError(false);
+      await signInWithEmailAndPassword(values.email, values.password);
+      setValues({ email: values.email, password: "", showPassword: false });
+    } else {
+      setEmailError(true);
+      setValues({ email: values.email, password: "", showPassword: false });
+    }
+  };
   const loginWithGoogle = async () => {
     const googleUser = await signInWithGoogle();
     if (
       !users?.find(({ uid }) => {
-        console.log(uid, googleUser?.user.uid);
         return uid == googleUser?.user.uid;
       })
     ) {
@@ -108,6 +116,7 @@ const Login = (props: Props) => {
                   id="outlined-email-required"
                   label="Email"
                   value={values.email}
+                  error={emailError}
                   onChange={handleChange("email")}
                 />
                 <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">
@@ -118,6 +127,7 @@ const Login = (props: Props) => {
                     id="outlined-adornment-password"
                     type={values.showPassword ? "text" : "password"}
                     value={values.password}
+                    error={emailError}
                     onChange={handleChange("password")}
                     endAdornment={
                       <InputAdornment position="end">
@@ -138,6 +148,11 @@ const Login = (props: Props) => {
                     label="Password"
                   />
                 </FormControl>
+                {emailError && (
+                  <Typography variant="overline" color="error" sx={{ mb: 1 }}>
+                    Wrong password or email
+                  </Typography>
+                )}
                 <Button sx={{ mb: 1 }} variant="contained" onClick={login}>
                   Login
                 </Button>

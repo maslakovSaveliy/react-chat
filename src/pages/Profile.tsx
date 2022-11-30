@@ -26,6 +26,7 @@ import {
   addDoc,
   collection,
   doc,
+  DocumentData,
   getFirestore,
   orderBy,
   Query,
@@ -58,12 +59,21 @@ const Profile = () => {
   };
   const [valuesError, setValuesError] = useState<boolean>(false);
   const [isPostSending, setIsPostSending] = useState(false);
-
+  const [user, setUser] = useState<IUser | null | undefined | DocumentData>(
+    null
+  );
+  const fetchUser = () => {
+    const userDB = users?.find((user) => user.uid == userAuth?.uid);
+    setUser(userDB);
+  };
+  useEffect(() => {
+    fetchUser();
+  });
   const addPost = async (
     value: FormValues,
     setValue: ({}: FormValues) => void
   ) => {
-    if (value.body.length > 0 && value.title.length > 0) {
+    if (value.body.length > 0 || value.title.length > 0) {
       setValuesError(false);
       setIsPostSending(true);
       await updateDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
@@ -154,11 +164,7 @@ const Profile = () => {
               {usersLoading ? (
                 <CircularProgress />
               ) : (
-                <FriendsList
-                  friends={
-                    users?.find((user) => user.uid == userAuth?.uid)?.friends
-                  }
-                />
+                <FriendsList friends={user?.friends} />
               )}
             </Paper>
           </Grid>
@@ -177,26 +183,23 @@ const Profile = () => {
                 {usersLoading ? (
                   <CircularProgress />
                 ) : (
-                  users
-                    ?.find((user) => user.uid == userAuth?.uid)
-                    ?.posts?.reverse()
-                    .map((post: IPost, index: number) => (
-                      <Fade key={index} in={true}>
-                        <Grid
-                          sx={{
-                            padding: "0.2cm",
-                            m: 1,
-                            borderTop: "1px solid lightgray",
-                          }}
-                        >
-                          <Typography variant="h3">{post.title}</Typography>
-                          <Typography variant="h5">{post.body}</Typography>
-                          <Typography variant="body2" color="lightgray">
-                            {post.createdAt.toDate().toUTCString()}
-                          </Typography>
-                        </Grid>
-                      </Fade>
-                    ))
+                  user?.posts?.reverse().map((post: IPost, index: number) => (
+                    <Fade key={index} in={true}>
+                      <Grid
+                        sx={{
+                          padding: "0.2cm",
+                          m: 1,
+                          borderTop: "1px solid lightgray",
+                        }}
+                      >
+                        <Typography variant="h3">{post.title}</Typography>
+                        <Typography variant="h5">{post.body}</Typography>
+                        <Typography variant="body2" color="lightgray">
+                          {post.createdAt.toDate().toUTCString()}
+                        </Typography>
+                      </Grid>
+                    </Fade>
+                  ))
                 )}
                 <div ref={lastElement} />
               </Grid>
