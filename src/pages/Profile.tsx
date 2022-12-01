@@ -20,6 +20,7 @@ import {
   useDocumentData,
   useDocumentOnce,
 } from "react-firebase-hooks/firestore";
+import CreateIcon from "@mui/icons-material/Create";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../utils/root-grid.css";
 import {
@@ -46,7 +47,8 @@ interface FormValues {
   body: string;
 }
 const Profile = () => {
-  const { open, handleClose, handleOpen } = useContext(Context);
+  const { openAddPost, handleCloseAddPost, handleOpenAddPost } =
+    useContext(Context);
   const lastElement = useRef<HTMLDivElement>(null);
   const auth = getAuth();
   const firestore = getFirestore();
@@ -55,7 +57,7 @@ const Profile = () => {
     collection(firestore, "users")
   );
   const openModal = async () => {
-    handleOpen();
+    handleOpenAddPost();
   };
   const [valuesError, setValuesError] = useState<boolean>(false);
   const [isPostSending, setIsPostSending] = useState(false);
@@ -69,6 +71,7 @@ const Profile = () => {
   useEffect(() => {
     fetchUser();
   });
+  const editPost = async () => {};
   const addPost = async (
     value: FormValues,
     setValue: ({}: FormValues) => void
@@ -87,7 +90,7 @@ const Profile = () => {
         ],
       });
       setIsPostSending(false);
-      handleClose();
+      handleCloseAddPost();
       setValue({ title: "", body: "" });
     } else {
       setValuesError(true);
@@ -122,15 +125,15 @@ const Profile = () => {
                 <Modal
                   aria-labelledby="transition-modal-title"
                   aria-describedby="transition-modal-description"
-                  open={open}
-                  onClose={handleClose}
+                  open={openAddPost}
+                  onClose={handleCloseAddPost}
                   closeAfterTransition
                   BackdropComponent={Backdrop}
                   BackdropProps={{
                     timeout: 500,
                   }}
                 >
-                  <Fade in={open}>
+                  <Fade in={openAddPost}>
                     <Box
                       id="modal"
                       sx={{
@@ -186,13 +189,26 @@ const Profile = () => {
                   user?.posts?.reverse().map((post: IPost, index: number) => (
                     <Fade key={index} in={true}>
                       <Grid
+                        id="parent"
                         sx={{
                           padding: "0.2cm",
                           m: 1,
                           borderTop: "1px solid lightgray",
                         }}
                       >
-                        <Typography variant="h3">{post.title}</Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="h3">{post.title}</Typography>
+                          <CreateIcon
+                            id="child"
+                            sx={{ cursor: "pointer" }}
+                            onClick={editPost}
+                          />
+                        </Box>
                         <Typography variant="h5">{post.body}</Typography>
                         <Typography variant="body2" color="lightgray">
                           {post.createdAt.toDate().toUTCString()}

@@ -18,11 +18,13 @@ function App() {
   const firstElement = useRef<HTMLDivElement>(null);
   const [toTopBtn, setToTopBtn] = useState(false);
   useObserver(setToTopBtn, firstElement);
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [openAddPost, setOpenAddPost] = React.useState(false);
+  const handleOpenAddPost = () => setOpenAddPost(true);
+  const handleCloseAddPost = () => setOpenAddPost(false);
   return (
-    <Context.Provider value={{ open, handleClose, handleOpen }}>
+    <Context.Provider
+      value={{ openAddPost, handleCloseAddPost, handleOpenAddPost }}
+    >
       <BrowserRouter>
         <div ref={firstElement}></div>
         {loading ? (
