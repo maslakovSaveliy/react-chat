@@ -70,7 +70,7 @@ const Login = (props: Props) => {
   const [users] = useCollectionData(collection(firestore, "users"));
   const [emailError, setEmailError] = useState<boolean>(false);
   const login = async () => {
-    if (!users?.map((user) => user.email == values.email)) {
+    if (users?.map((user) => user.email == values.email)) {
       setEmailError(false);
       await signInWithEmailAndPassword(values.email, values.password);
       setValues({ email: values.email, password: "", showPassword: false });

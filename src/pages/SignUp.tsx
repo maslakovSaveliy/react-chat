@@ -66,6 +66,7 @@ const Signup = (props: Props) => {
   const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile] = useUpdateProfile(auth);
+  const [userError, setUserError] = useState<boolean>(false);
   const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
     useSignInWithGoogle(auth);
   const signup = async () => {
@@ -77,18 +78,20 @@ const Signup = (props: Props) => {
     await updateProfile({ displayName });
     if (
       !users?.find(({ uid }) => {
-        console.log(uid, emailUser?.user.uid);
         return uid == emailUser?.user.uid;
       })
     ) {
-      await setDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
-        displayName: auth.currentUser?.displayName,
-        email: auth.currentUser?.email,
-        photoURL: auth.currentUser?.photoURL,
-        uid: auth.currentUser?.uid,
+      setUserError(false);
+      await setDoc(doc(firestore, "users", `${auth?.currentUser?.uid}`), {
+        displayName: auth?.currentUser?.displayName,
+        email: auth?.currentUser?.email,
+        photoURL: auth?.currentUser?.photoURL,
+        uid: auth?.currentUser?.uid,
         friends: [],
         posts: [],
       });
+    } else {
+      setUserError(true);
     }
   };
   const firestore = getFirestore();

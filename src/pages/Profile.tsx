@@ -42,13 +42,20 @@ import FriendsList from "../components/FriendsList";
 import { Context } from "../context/Context";
 import { IUser } from "../models/IUser";
 import { IPost } from "../models/IPost";
+import EditPostForm from "../components/EditPostForm";
 interface FormValues {
   title: string;
   body: string;
 }
 const Profile = () => {
-  const { openAddPost, handleCloseAddPost, handleOpenAddPost } =
-    useContext(Context);
+  const {
+    openAddPost,
+    handleCloseAddPost,
+    handleOpenAddPost,
+    openEditPost,
+    handleOpenEditPost,
+    handleCloseEditPost,
+  } = useContext(Context);
   const lastElement = useRef<HTMLDivElement>(null);
   const auth = getAuth();
   const firestore = getFirestore();
@@ -156,6 +163,36 @@ const Profile = () => {
                     </Box>
                   </Fade>
                 </Modal>
+                <Modal
+                  aria-labelledby="transition-modal-title"
+                  aria-describedby="transition-modal-description"
+                  open={openEditPost}
+                  onClose={handleCloseEditPost}
+                  closeAfterTransition
+                  BackdropComponent={Backdrop}
+                  BackdropProps={{
+                    timeout: 500,
+                  }}
+                >
+                  <Fade in={openEditPost}>
+                    <Box
+                      id="modal"
+                      sx={{
+                        position: "absolute" as "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 400,
+                        bgcolor: "background.paper",
+                        borderRadius: 3,
+                        boxShadow: 24,
+                        p: 4,
+                      }}
+                    >
+                      <EditPostForm />
+                    </Box>
+                  </Fade>
+                </Modal>
               </Grid>
             </Paper>
             <Paper
@@ -206,7 +243,7 @@ const Profile = () => {
                           <CreateIcon
                             id="child"
                             sx={{ cursor: "pointer" }}
-                            onClick={editPost}
+                            onClick={handleOpenEditPost}
                           />
                         </Box>
                         <Typography variant="h5">{post.body}</Typography>

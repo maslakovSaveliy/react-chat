@@ -21,9 +21,19 @@ function App() {
   const [openAddPost, setOpenAddPost] = React.useState(false);
   const handleOpenAddPost = () => setOpenAddPost(true);
   const handleCloseAddPost = () => setOpenAddPost(false);
+  const [openEditPost, setOpenEditPost] = React.useState(false);
+  const handleOpenEditPost = () => setOpenEditPost(true);
+  const handleCloseEditPost = () => setOpenEditPost(false);
   return (
     <Context.Provider
-      value={{ openAddPost, handleCloseAddPost, handleOpenAddPost }}
+      value={{
+        openAddPost,
+        handleCloseAddPost,
+        handleOpenAddPost,
+        openEditPost,
+        handleOpenEditPost,
+        handleCloseEditPost,
+      }}
     >
       <BrowserRouter>
         <div ref={firstElement}></div>
