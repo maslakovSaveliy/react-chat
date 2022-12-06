@@ -1,4 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Avatar,
   Backdrop,
@@ -43,9 +50,11 @@ import { Context } from "../context/Context";
 import { IUser } from "../models/IUser";
 import { IPost } from "../models/IPost";
 import EditPostForm from "../components/EditPostForm";
+import { isEqual } from "../utils/isEqual";
 interface FormValues {
   title: string;
   body: string;
+  id: number | null;
 }
 const Profile = () => {
   const {
@@ -75,10 +84,28 @@ const Profile = () => {
     const userDB = users?.find((user) => user.uid == userAuth?.uid);
     setUser(userDB);
   };
+  const [posts, setPosts] = useState<IPost[]>([]);
   useEffect(() => {
     fetchUser();
+    setPosts(user?.posts);
+  }, [users, user, posts]);
+  const [post, setPost] = useState<IPost>({
+    title: "",
+    body: "",
+    createdAt: null,
+    id: null,
   });
-  const editPost = async () => {};
+  const editPost = async (oldPost: IPost, posts: IPost[], post: IPost) => {
+    let res = posts?.map((postAr) => {
+      if (isEqual(oldPost, postAr)) {
+        return (postAr = { ...postAr, title: post.title, body: post.body });
+      }
+      return postAr;
+    });
+    await updateDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
+      posts: res,
+    });
+  };
   const addPost = async (
     value: FormValues,
     setValue: ({}: FormValues) => void
@@ -93,12 +120,13 @@ const Profile = () => {
             body: value.body,
             title: value.title,
             createdAt: Timestamp.now(),
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
           },
         ],
       });
       setIsPostSending(false);
       handleCloseAddPost();
-      setValue({ title: "", body: "" });
+      setValue({ title: "", body: "", id: null });
     } else {
       setValuesError(true);
     }
@@ -189,7 +217,12 @@ const Profile = () => {
                         p: 4,
                       }}
                     >
-                      <EditPostForm />
+                      <EditPostForm
+                        post={post}
+                        setPost={setPost}
+                        editPost={editPost}
+                        posts={posts}
+                      />
                     </Box>
                   </Fade>
                 </Modal>
@@ -223,7 +256,7 @@ const Profile = () => {
                 {usersLoading ? (
                   <CircularProgress />
                 ) : (
-                  user?.posts?.reverse().map((post: IPost, index: number) => (
+                  user?.posts?.map((post: IPost, index: number) => (
                     <Fade key={index} in={true}>
                       <Grid
                         id="parent"
@@ -243,12 +276,15 @@ const Profile = () => {
                           <CreateIcon
                             id="child"
                             sx={{ cursor: "pointer" }}
-                            onClick={handleOpenEditPost}
+                            onClick={() => {
+                              setPost(post);
+                              handleOpenEditPost();
+                            }}
                           />
                         </Box>
                         <Typography variant="h5">{post.body}</Typography>
                         <Typography variant="body2" color="lightgray">
-                          {post.createdAt.toDate().toUTCString()}
+                          {post.createdAt?.toDate().toUTCString()}
                         </Typography>
                       </Grid>
                     </Fade>

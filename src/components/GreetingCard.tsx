@@ -8,7 +8,7 @@ type Props = {};
 
 const GreetingCard = (props: Props) => {
   const navigate = useNavigate();
-  const { handleOpen } = useContext(Context);
+  const { handleOpenAddPost } = useContext(Context);
   return (
     <Box
       sx={{
@@ -35,7 +35,7 @@ const GreetingCard = (props: Props) => {
           <Button
             onClick={() => {
               navigate("/profile");
-              handleOpen();
+              handleOpenAddPost();
             }}
           >
             Share it!

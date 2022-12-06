@@ -4,6 +4,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 interface FormValues {
   title: string;
   body: string;
+  id: number | null;
 }
 type Props = {
   addPost: (value: FormValues, setValue: ({}: FormValues) => void) => void;
@@ -14,6 +15,7 @@ const AddPostForm: FC<Props> = ({ addPost, isLoading, error }) => {
   const [formValues, setFormValues] = useState<FormValues>({
     title: "",
     body: "",
+    id: null,
   });
   return (
     <Container>
@@ -41,6 +43,7 @@ const AddPostForm: FC<Props> = ({ addPost, isLoading, error }) => {
               error={error}
               sx={{ mb: 1 }}
               required
+              multiline
               label="Description"
               value={formValues.body}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
