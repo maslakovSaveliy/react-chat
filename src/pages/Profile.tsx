@@ -51,6 +51,7 @@ import { IPost } from "../models/IPost";
 import EditPostForm from "../components/EditPostForm";
 import { isEqual } from "../utils/isEqual";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { TransitionGroup } from "react-transition-group";
 interface FormValues {
   title: string;
   body: string;
@@ -263,48 +264,50 @@ const Profile = () => {
                 {usersLoading ? (
                   <CircularProgress />
                 ) : (
-                  user?.posts?.map((post: IPost, index: number) => (
-                    <Fade key={index} in={true}>
-                      <Grid
-                        id="parent"
-                        sx={{
-                          padding: "0.2cm",
-                          m: 1,
-                          borderTop: "1px solid lightgray",
-                        }}
-                      >
-                        <Box
+                  <TransitionGroup>
+                    {user?.posts?.map((post: IPost, index: number) => (
+                      <Fade key={index} in={true}>
+                        <Grid
+                          id="parent"
                           sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
+                            padding: "0.2cm",
+                            m: 1,
+                            borderTop: "1px solid lightgray",
                           }}
                         >
-                          <Typography variant="h3">{post.title}</Typography>
-                          <Box>
-                            <CreateIcon
-                              id="child"
-                              sx={{ cursor: "pointer" }}
-                              onClick={() => {
-                                setPost(post);
-                                handleOpenEditPost();
-                              }}
-                            />
-                            <DeleteIcon
-                              id="child"
-                              sx={{ cursor: "pointer" }}
-                              onClick={() => {
-                                deletePost(post);
-                              }}
-                            />
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="h3">{post.title}</Typography>
+                            <Box>
+                              <CreateIcon
+                                id="child"
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                  setPost(post);
+                                  handleOpenEditPost();
+                                }}
+                              />
+                              <DeleteIcon
+                                id="child"
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                  deletePost(post);
+                                }}
+                              />
+                            </Box>
                           </Box>
-                        </Box>
-                        <Typography variant="h5">{post.body}</Typography>
-                        <Typography variant="body2" color="lightgray">
-                          {post.createdAt?.toDate().toUTCString()}
-                        </Typography>
-                      </Grid>
-                    </Fade>
-                  ))
+                          <Typography variant="h5">{post.body}</Typography>
+                          <Typography variant="body2" color="lightgray">
+                            {post.createdAt?.toDate().toUTCString()}
+                          </Typography>
+                        </Grid>
+                      </Fade>
+                    ))}
+                  </TransitionGroup>
                 )}
                 <div ref={lastElement} />
               </Grid>
