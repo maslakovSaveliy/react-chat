@@ -42,6 +42,7 @@ import {
   serverTimestamp,
   Timestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import AddPostForm from "../components/AddPostForm";
 import FriendsList from "../components/FriendsList";
@@ -71,7 +72,10 @@ const Profile = () => {
   const firestore = getFirestore();
   const [userAuth] = useAuthState(auth);
   const [users, usersLoading] = useCollectionData(
-    collection(firestore, "users")
+    query(
+      collection(firestore, "users"),
+      where("uid", "==", `${auth.currentUser?.uid}`)
+    )
   );
   const openModal = async () => {
     handleOpenAddPost();
@@ -88,12 +92,16 @@ const Profile = () => {
   const [posts, setPosts] = useState<IPost[]>([]);
   useEffect(() => {
     fetchUser();
-    setPosts(user?.posts);
+    setPosts(
+      user?.posts.sort(
+        (a: IPost, b: IPost) => b?.createdAt?.seconds - a?.createdAt?.seconds
+      )
+    );
   }, [users, user, posts]);
   const [post, setPost] = useState<IPost>({
     title: "",
     body: "",
-    createdAt: null,
+    createdAt: Timestamp.now(),
     id: null,
   });
   const editPost = async (oldPost: IPost, posts: IPost[], post: IPost) => {
