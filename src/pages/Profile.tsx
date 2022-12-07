@@ -44,13 +44,13 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import AddPostForm from "../components/AddPostForm";
-import { app } from "../firebase";
 import FriendsList from "../components/FriendsList";
 import { Context } from "../context/Context";
 import { IUser } from "../models/IUser";
 import { IPost } from "../models/IPost";
 import EditPostForm from "../components/EditPostForm";
 import { isEqual } from "../utils/isEqual";
+import DeleteIcon from "@mui/icons-material/Delete";
 interface FormValues {
   title: string;
   body: string;
@@ -131,6 +131,13 @@ const Profile = () => {
       setValuesError(true);
     }
   };
+  const deletePost = async (oldPost: IPost) => {
+    let res = posts?.filter((postAr) => postAr.id !== oldPost.id);
+    await updateDoc(doc(firestore, "users", `${auth.currentUser?.uid}`), {
+      posts: res,
+    });
+  };
+
   return (
     <Container>
       <Grid
@@ -273,14 +280,23 @@ const Profile = () => {
                           }}
                         >
                           <Typography variant="h3">{post.title}</Typography>
-                          <CreateIcon
-                            id="child"
-                            sx={{ cursor: "pointer" }}
-                            onClick={() => {
-                              setPost(post);
-                              handleOpenEditPost();
-                            }}
-                          />
+                          <Box>
+                            <CreateIcon
+                              id="child"
+                              sx={{ cursor: "pointer" }}
+                              onClick={() => {
+                                setPost(post);
+                                handleOpenEditPost();
+                              }}
+                            />
+                            <DeleteIcon
+                              id="child"
+                              sx={{ cursor: "pointer" }}
+                              onClick={() => {
+                                deletePost(post);
+                              }}
+                            />
+                          </Box>
                         </Box>
                         <Typography variant="h5">{post.body}</Typography>
                         <Typography variant="body2" color="lightgray">
